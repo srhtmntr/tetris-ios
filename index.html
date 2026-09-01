@@ -10,60 +10,95 @@
     <title>Clean Tetris</title>
     <style>
         :root {
-            --bg-color: #f5f5f7; /* Apple stili açık gri arka plan */
-            --grid-color: #e5e5ea;
+            --bg-color: #f2f2f7; 
             --text-color: #1c1c1e;
+            --accent-color: #007aff;
         }
 
         body {
             margin: 0;
             padding: 0;
             background-color: var(--bg-color);
+            background-image: radial-gradient(circle at 50% 50%, #ffffff 0%, #e5e5ea 100%);
             color: var(--text-color);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", Roboto, Helvetica, Arial, sans-serif;
             overflow: hidden;
             touch-action: none;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
             height: 100vh;
-            padding-top: env(safe-area-inset-top, 20px);
+            padding-top: env(safe-area-inset-top, 40px);
             padding-bottom: env(safe-area-inset-bottom, 20px);
             box-sizing: border-box;
         }
 
+        /* Glassmorphism Skor Tabelası */
         #ui-layer {
-            width: 100%;
+            width: 90%;
             max-width: 400px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 20px;
+            padding: 15px 25px;
+            margin-bottom: 20px;
             box-sizing: border-box;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.8);
             z-index: 10;
         }
 
         .score-board {
-            font-size: 1.5rem;
-            font-weight: 700;
+            font-size: 1.2rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: #8e8e93;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #score {
+            font-size: 1.8rem;
+            color: var(--text-color);
+            transition: transform 0.1s ease;
+        }
+
+        /* Pop Animasyonu */
+        .pop {
+            animation: popAnim 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            color: var(--accent-color) !important;
+        }
+
+        @keyframes popAnim {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.4); }
+            100% { transform: scale(1); }
         }
 
         #game-container {
             position: relative;
-            flex-grow: 1;
             display: flex;
             align-items: center;
             justify-content: center;
             width: 100%;
             max-width: 400px;
+            flex-grow: 1;
+            padding-bottom: 20px;
         }
 
         canvas {
-            background-color: #ffffff; /* Matrisin içi tam beyaz */
-            border: 2px solid #d1d1d6;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border: 2px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
         }
 
         #game-over-screen {
@@ -72,51 +107,63 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(242, 242, 247, 0.75);
             display: none;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             z-index: 20;
-            backdrop-filter: blur(5px);
-            border-radius: 8px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 12px;
         }
 
         #game-over-screen h1 {
+            font-size: 2.5rem;
             color: #ff3b30;
-            margin-bottom: 20px;
+            margin-bottom: 5px;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+        
+        #final-score {
+            font-size: 1.2rem;
+            color: #8e8e93;
+            margin-bottom: 30px;
+            font-weight: 600;
         }
 
         button {
-            padding: 15px 30px;
+            padding: 16px 40px;
             font-size: 1.2rem;
-            font-weight: 600;
-            background: #007aff;
+            font-weight: 700;
+            background: var(--accent-color);
             color: #fff;
             border: none;
-            border-radius: 12px;
+            border-radius: 30px;
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
-            transition: all 0.2s ease;
+            box-shadow: 0 10px 20px rgba(0, 122, 255, 0.3);
+            transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
 
         button:active {
-            background: #0056b3;
-            transform: scale(0.95);
+            transform: scale(0.92);
+            box-shadow: 0 4px 10px rgba(0, 122, 255, 0.2);
         }
     </style>
 </head>
 <body>
 
     <div id="ui-layer">
-        <div class="score-board">SKOR: <span id="score">0</span></div>
+        <div class="score-board">SKOR <span id="score">0</span></div>
     </div>
 
     <div id="game-container">
         <canvas id="tetris"></canvas>
         <div id="game-over-screen">
             <h1>OYUN BİTTİ</h1>
-            <button id="restart-btn">Yeniden Başlat</button>
+            <div id="final-score">Skorun: <span>0</span></div>
+            <button id="restart-btn">Tekrar Oyna</button>
         </div>
     </div>
 
@@ -125,6 +172,7 @@
         const context = canvas.getContext('2d');
         const scoreElement = document.getElementById('score');
         const gameOverScreen = document.getElementById('game-over-screen');
+        const finalScoreElement = document.querySelector('#final-score span');
         const restartBtn = document.getElementById('restart-btn');
 
         const ROWS = 20;
@@ -135,7 +183,7 @@
             const containerHeight = document.getElementById('game-container').clientHeight;
             const containerWidth = window.innerWidth;
             
-            BLOCK_SIZE = Math.floor(Math.min((containerHeight - 20) / ROWS, (containerWidth - 20) / COLS));
+            BLOCK_SIZE = Math.floor(Math.min(containerHeight / ROWS, (containerWidth - 40) / COLS));
             
             canvas.width = BLOCK_SIZE * COLS;
             canvas.height = BLOCK_SIZE * ROWS;
@@ -146,25 +194,18 @@
 
         const SHAPES = [
             [],
-            [[0, 0, 0, 0], [1, 1, 1, 1], [0, 0, 0, 0], [0, 0, 0, 0]], 
-            [[2, 0, 0], [2, 2, 2], [0, 0, 0]], 
-            [[0, 0, 3], [3, 3, 3], [0, 0, 0]], 
-            [[4, 4], [4, 4]], 
-            [[0, 5, 5], [5, 5, 0], [0, 0, 0]], 
-            [[0, 6, 0], [6, 6, 6], [0, 0, 0]], 
-            [[7, 7, 0], [0, 7, 7], [0, 0, 0]]  
+            [[0, 0, 0, 0], [1, 1, 1, 1], [0, 0, 0, 0], [0, 0, 0, 0]], // I
+            [[2, 0, 0], [2, 2, 2], [0, 0, 0]], // J
+            [[0, 0, 3], [3, 3, 3], [0, 0, 0]], // L
+            [[4, 4], [4, 4]], // O
+            [[0, 5, 5], [5, 5, 0], [0, 0, 0]], // S
+            [[0, 6, 0], [6, 6, 6], [0, 0, 0]], // T
+            [[7, 7, 0], [0, 7, 7], [0, 0, 0]]  // Z
         ];
 
-        // Açık temada göze çok daha iyi hitap eden, mat, canlı ve kontrast renkler
         const COLORS = [
             null,
-            '#32ADE6', // Cyan (I)
-            '#007AFF', // Blue (J)
-            '#FF9500', // Orange (L)
-            '#FFCC00', // Yellow (O)
-            '#34C759', // Green (S)
-            '#AF52DE', // Purple (T)
-            '#FF3B30'  // Red (Z)
+            '#32ADE6', '#007AFF', '#FF9500', '#FFCC00', '#34C759', '#AF52DE', '#FF3B30'
         ];
 
         let board = createMatrix(COLS, ROWS);
@@ -214,6 +255,8 @@
 
         function arenaSweep() {
             let rowCount = 1;
+            let linesCleared = false;
+            
             outer: for (let y = board.length - 1; y >= 0; --y) {
                 for (let x = 0; x < board[y].length; ++x) {
                     if (board[y][x] === 0) {
@@ -225,12 +268,20 @@
                 ++y;
                 score += rowCount * 100;
                 rowCount *= 2; 
+                linesCleared = true;
                 
-                if (dropInterval > 200) {
-                    dropInterval -= 20; 
+                if (dropInterval > 150) {
+                    dropInterval -= 25; 
                 }
             }
-            scoreElement.innerText = score;
+            
+            if (linesCleared) {
+                scoreElement.innerText = score;
+                // Pop animasyonunu tetikle
+                scoreElement.classList.remove('pop');
+                void scoreElement.offsetWidth; // DOM reflow hilesi
+                scoreElement.classList.add('pop');
+            }
         }
 
         function playerReset() {
@@ -242,6 +293,7 @@
             
             if (collide(board, player)) {
                 gameOver = true;
+                finalScoreElement.innerText = score;
                 gameOverScreen.style.display = 'flex';
                 cancelAnimationFrame(animationId);
             }
@@ -304,22 +356,70 @@
             dropCounter = 0;
         }
 
-        function drawMatrix(matrix, offset) {
+        // --- YENİ ÇİZİM MOTORU (3D Hacim + Hayalet Taşı) ---
+        function drawMatrix(matrix, offset, isGhost = false) {
             matrix.forEach((row, y) => {
                 row.forEach((value, x) => {
                     if (value !== 0) {
-                        context.fillStyle = COLORS[value];
-                        // Shadow (gölge) özelliğini tamamen kaldırdık. 
-                        // Sadece saf ve keskin çizim yapıyoruz.
-                        context.fillRect(x + offset.x + 0.05, y + offset.y + 0.05, 0.9, 0.9);
+                        if (isGhost) {
+                            // Ghost Piece (Sadece dış hat)
+                            context.fillStyle = 'rgba(0, 0, 0, 0)';
+                            context.lineWidth = 0.05;
+                            context.strokeStyle = COLORS[value];
+                            context.strokeRect(x + offset.x + 0.05, y + offset.y + 0.05, 0.9, 0.9);
+                            context.fillStyle = COLORS[value] + '20'; // %12 Opaklık (Hex saydamlık)
+                            context.fillRect(x + offset.x + 0.05, y + offset.y + 0.05, 0.9, 0.9);
+                        } else {
+                            // Ana Renk Dolgusu
+                            context.fillStyle = COLORS[value];
+                            context.fillRect(x + offset.x, y + offset.y, 1, 1);
+                            
+                            // 3D Bevel Efekti (Işık ve Gölge Hilesi)
+                            // Üst kenar (Beyaz parlama)
+                            context.fillStyle = 'rgba(255, 255, 255, 0.4)';
+                            context.fillRect(x + offset.x, y + offset.y, 1, 0.15);
+                            // Sol kenar (Beyaz parlama)
+                            context.fillRect(x + offset.x, y + offset.y, 0.15, 1);
+                            
+                            // Alt kenar (Siyah gölge)
+                            context.fillStyle = 'rgba(0, 0, 0, 0.3)';
+                            context.fillRect(x + offset.x, y + offset.y + 0.85, 1, 0.15);
+                            // Sağ kenar (Siyah gölge)
+                            context.fillRect(x + offset.x + 0.85, y + offset.y, 0.15, 1);
+                            
+                            // Bloklar arası hafif boşluk (Grid hissi)
+                            context.fillStyle = 'rgba(0, 0, 0, 0.1)';
+                            context.fillRect(x + offset.x, y + offset.y, 1, 1);
+                            context.fillStyle = COLORS[value];
+                            context.fillRect(x + offset.x + 0.05, y + offset.y + 0.05, 0.9, 0.9);
+                        }
                     }
                 });
             });
         }
 
+        // Hayalet taşı hesaplayıp çizdiren fonksiyon
+        function drawGhost() {
+            const ghost = {
+                matrix: player.matrix,
+                pos: { x: player.pos.x, y: player.pos.y }
+            };
+            
+            // Çarpana kadar hayalet taşı aşağı it
+            while (!collide(board, ghost)) {
+                ghost.pos.y++;
+            }
+            ghost.pos.y--; // Çarptığı yerin bir üstüne al
+            
+            // Sadece eğer oyuncuyla aynı hizada değilse çiz (kafa karışıklığını önler)
+            if (ghost.pos.y > player.pos.y) {
+                drawMatrix(ghost.matrix, ghost.pos, true);
+            }
+        }
+
         function drawGrid() {
-            context.strokeStyle = 'rgba(0, 0, 0, 0.05)';
-            context.lineWidth = 0.02;
+            context.strokeStyle = 'rgba(0, 0, 0, 0.04)';
+            context.lineWidth = 0.03;
             for (let i = 0; i <= COLS; i++) {
                 context.beginPath();
                 context.moveTo(i, 0);
@@ -335,13 +435,13 @@
         }
 
         function draw() {
-            // Arka plan artık matris rengi (beyaz)
-            context.fillStyle = '#ffffff';
-            context.fillRect(0, 0, canvas.width, canvas.height);
+            // Şeffaf temizleme (Arka plan Canvas'ın CSS background'undan gelir)
+            context.clearRect(0, 0, canvas.width, canvas.height);
             
             drawGrid();
             drawMatrix(board, {x: 0, y: 0});
-            drawMatrix(player.matrix, player.pos);
+            drawGhost(); // Önce gölgeyi çiz
+            drawMatrix(player.matrix, player.pos); // Sonra asıl taşı üzerine çiz
         }
 
         function update(time = 0) {
@@ -437,6 +537,7 @@
             score = 0;
             dropInterval = 1000;
             scoreElement.innerText = score;
+            scoreElement.classList.remove('pop');
             gameOverScreen.style.display = 'none';
             gameOver = false;
             playerReset();
