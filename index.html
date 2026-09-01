@@ -1,0 +1,496 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2685.7">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  </style>
+</head>
+<body>
+<p class="p1">&lt;!DOCTYPE html&gt;</p>
+<p class="p1">&lt;html lang="tr"&gt;</p>
+<p class="p1">&lt;head&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta charset="UTF-8"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta name="apple-mobile-web-app-capable" content="yes"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta name="apple-mobile-web-app-title" content="Tetris"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;link rel="apple-touch-icon" href="https://upload.wikimedia.org/wikipedia/commons/3/39/Tetrominoes_IJLO_SZ_T.svg"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;title&gt;Neon Tetris&lt;/title&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;style&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>:root {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>--bg-color: #0d0d0d;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>--grid-color: #222;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>--text-color: #fff;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>--neon-glow: 10px;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>body {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>margin: 0;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>padding: 0;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background-color: var(--bg-color);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>color: var(--text-color);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-family: 'Courier New', Courier, monospace;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>overflow: hidden;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>/* Tarayıcı kaydırmalarını engelleme */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>touch-action: none;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>flex-direction: column;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>align-items: center;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>justify-content: center;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>height: 100vh;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>/* iOS Safe Area Uyumluluğu */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>padding-top: env(safe-area-inset-top, 20px);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>padding-bottom: env(safe-area-inset-bottom, 20px);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>box-sizing: border-box;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>#ui-layer {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>width: 100%;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>max-width: 400px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>justify-content: space-between;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>align-items: center;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>padding: 10px 20px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>box-sizing: border-box;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>z-index: 10;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.score-board {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-size: 1.5rem;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-weight: bold;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>text-shadow: 0 0 5px #fff;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>#game-container {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>position: relative;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>flex-grow: 1;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>align-items: center;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>justify-content: center;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>width: 100%;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>max-width: 400px;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>canvas {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background-color: var(--bg-color);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border: 2px solid var(--grid-color);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 5px;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>#game-over-screen {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>position: absolute;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>top: 0;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>left: 0;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>width: 100%;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>height: 100%;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background: rgba(0, 0, 0, 0.85);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>display: none;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>flex-direction: column;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>align-items: center;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>justify-content: center;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>z-index: 20;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>backdrop-filter: blur(3px);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>#game-over-screen h1 {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>color: #ff003c;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>text-shadow: 0 0 10px #ff003c;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 20px;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>button {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>padding: 15px 30px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-size: 1.2rem;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-family: inherit;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background: transparent;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>color: #00e5ff;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border: 2px solid #00e5ff;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 8px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>cursor: pointer;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>text-transform: uppercase;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 0 10px #00e5ff inset, 0 0 10px #00e5ff;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>transition: all 0.2s ease;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>button:active {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background: #00e5ff;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>color: #000;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/style&gt;</p>
+<p class="p1">&lt;/head&gt;</p>
+<p class="p1">&lt;body&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="ui-layer"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="score-board"&gt;SKOR: &lt;span id="score"&gt;0&lt;/span&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="game-container"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;canvas id="tetris"&gt;&lt;/canvas&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div id="game-over-screen"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;h1&gt;OYUN BİTTİ&lt;/h1&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;button id="restart-btn"&gt;Yeniden Başlat&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>// --- MOTOR VE MATRİS YAPILANDIRMASI ---</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const canvas = document.getElementById('tetris');</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const context = canvas.getContext('2d');</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const scoreElement = document.getElementById('score');</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const gameOverScreen = document.getElementById('game-over-screen');</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const restartBtn = document.getElementById('restart-btn');</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>const ROWS = 20;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const COLS = 10;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let BLOCK_SIZE;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Ekran boyutuna göre canvas'ı dinamik ölçeklendir (PWA için kritik)</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function resizeCanvas() {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const containerHeight = document.getElementById('game-container').clientHeight;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const containerWidth = window.innerWidth;</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Satır/sütun oranına sadık kalarak maksimum boyutu hesapla</p>
+<p class="p1"><span class="Apple-converted-space">            </span>BLOCK_SIZE = Math.floor(Math.min((containerHeight - 20) / ROWS, (containerWidth - 20) / COLS));</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>canvas.width = BLOCK_SIZE * COLS;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>canvas.height = BLOCK_SIZE * ROWS;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>context.scale(BLOCK_SIZE, BLOCK_SIZE);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>window.addEventListener('resize', resizeCanvas);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>resizeCanvas();</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// 7 Standart Tetromino ve Neon Renkleri</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const SHAPES = [</p>
+<p class="p1"><span class="Apple-converted-space">            </span>[], // Boş indeks (0 için)</p>
+<p class="p1"><span class="Apple-converted-space">            </span>[[0, 0, 0, 0], [1, 1, 1, 1], [0, 0, 0, 0], [0, 0, 0, 0]], // I (Cyan)</p>
+<p class="p1"><span class="Apple-converted-space">            </span>[[2, 0, 0], [2, 2, 2], [0, 0, 0]], // J (Blue)</p>
+<p class="p1"><span class="Apple-converted-space">            </span>[[0, 0, 3], [3, 3, 3], [0, 0, 0]], // L (Orange)</p>
+<p class="p1"><span class="Apple-converted-space">            </span>[[4, 4], [4, 4]], // O (Yellow)</p>
+<p class="p1"><span class="Apple-converted-space">            </span>[[0, 5, 5], [5, 5, 0], [0, 0, 0]], // S (Green)</p>
+<p class="p1"><span class="Apple-converted-space">            </span>[[0, 6, 0], [6, 6, 6], [0, 0, 0]], // T (Purple)</p>
+<p class="p1"><span class="Apple-converted-space">            </span>[[7, 7, 0], [0, 7, 7], [0, 0, 0]]<span class="Apple-converted-space">  </span>// Z (Red)</p>
+<p class="p1"><span class="Apple-converted-space">        </span>];</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>const COLORS = [</p>
+<p class="p1"><span class="Apple-converted-space">            </span>null,</p>
+<p class="p1"><span class="Apple-converted-space">            </span>'#00e5ff', // Cyan</p>
+<p class="p1"><span class="Apple-converted-space">            </span>'#2962ff', // Blue</p>
+<p class="p1"><span class="Apple-converted-space">            </span>'#ff6d00', // Orange</p>
+<p class="p1"><span class="Apple-converted-space">            </span>'#ffd600', // Yellow</p>
+<p class="p1"><span class="Apple-converted-space">            </span>'#00e676', // Green</p>
+<p class="p1"><span class="Apple-converted-space">            </span>'#d500f9', // Purple</p>
+<p class="p1"><span class="Apple-converted-space">            </span>'#ff1744'<span class="Apple-converted-space">  </span>// Red</p>
+<p class="p1"><span class="Apple-converted-space">        </span>];</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>let board = createMatrix(COLS, ROWS);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let dropCounter = 0;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let dropInterval = 1000;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let lastTime = 0;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let score = 0;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let gameOver = false;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let animationId;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>const player = {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>pos: {x: 0, y: 0},</p>
+<p class="p1"><span class="Apple-converted-space">            </span>matrix: null,</p>
+<p class="p1"><span class="Apple-converted-space">        </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// --- TEMEL FONKSİYONLAR ---</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function createMatrix(w, h) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const matrix = [];</p>
+<p class="p1"><span class="Apple-converted-space">            </span>while (h--) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>matrix.push(new Array(w).fill(0));</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>return matrix;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Çarpışma Algılaması (Collision Detection)</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function collide(board, player) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const m = player.matrix;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const o = player.pos;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>for (let y = 0; y &lt; m.length; ++y) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>for (let x = 0; x &lt; m[y].length; ++x) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>if (m[y][x] !== 0 &amp;&amp;</p>
+<p class="p1"><span class="Apple-converted-space">                       </span>(board[y + o.y] &amp;&amp; board[y + o.y][x + o.x]) !== 0) {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>return true;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>return false;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Bloğu matrise sabitleme</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function merge(board, player) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>player.matrix.forEach((row, y) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>row.forEach((value, x) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>if (value !== 0) {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>board[y + player.pos.y][x + player.pos.x] = value;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>});</p>
+<p class="p1"><span class="Apple-converted-space">            </span>});</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Dolu satırları silme ve skoru güncelleme</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function arenaSweep() {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>let rowCount = 1;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>outer: for (let y = board.length - 1; y &gt;= 0; --y) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>for (let x = 0; x &lt; board[y].length; ++x) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>if (board[y][x] === 0) {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>continue outer;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const row = board.splice(y, 1)[0].fill(0);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>board.unshift(row);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>++y;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>score += rowCount * 100;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>rowCount *= 2; // Çoklu satır siliminde kombosu</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// Hızlanma mekaniği</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (dropInterval &gt; 200) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>dropInterval -= 20;<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>scoreElement.innerText = score;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Yeni parça üretme</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function playerReset() {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const pieces = '1234567';</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const randIdx = Math.floor(Math.random() * pieces.length);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>player.matrix = SHAPES[pieces[randIdx]];</p>
+<p class="p1"><span class="Apple-converted-space">            </span>player.pos.y = 0;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>player.pos.x = Math.floor(COLS / 2) - Math.floor(player.matrix[0].length / 2);</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (collide(board, player)) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>gameOver = true;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>gameOverScreen.style.display = 'flex';</p>
+<p class="p1"><span class="Apple-converted-space">                </span>cancelAnimationFrame(animationId);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Rotasyon (Matris transpozisyonu ve ters çevirme)</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function rotate(matrix, dir) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>for (let y = 0; y &lt; matrix.length; ++y) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>for (let x = 0; x &lt; y; ++x) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>[matrix[x][y], matrix[y][x]] = [matrix[y][x], matrix[x][y]];</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (dir &gt; 0) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>matrix.forEach(row =&gt; row.reverse());</p>
+<p class="p1"><span class="Apple-converted-space">            </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>matrix.reverse();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>function playerRotate(dir) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const pos = player.pos.x;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>let offset = 1;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>rotate(player.matrix, dir);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Duvarlardan (sınırlardan) taşmayı engellemek için Wall Kick</p>
+<p class="p1"><span class="Apple-converted-space">            </span>while (collide(board, player)) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>player.pos.x += offset;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>offset = -(offset + (offset &gt; 0 ? 1 : -1));</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (offset &gt; player.matrix[0].length) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>rotate(player.matrix, -dir); // Olmuyorsa geri al</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>player.pos.x = pos;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>function playerMove(offset) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>player.pos.x += offset;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (collide(board, player)) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>player.pos.x -= offset;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>function playerDrop() {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>player.pos.y++;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (collide(board, player)) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>player.pos.y--;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>merge(board, player);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>playerReset();</p>
+<p class="p1"><span class="Apple-converted-space">                </span>arenaSweep();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>dropCounter = 0;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>function playerHardDrop() {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>while (!collide(board, player)) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>player.pos.y++;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>player.pos.y--; // Çarptığı anın bir üstüne geri dön</p>
+<p class="p1"><span class="Apple-converted-space">            </span>merge(board, player);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>playerReset();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>arenaSweep();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>dropCounter = 0;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// --- ÇİZİM İŞLEMLERİ ---</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function drawMatrix(matrix, offset) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>matrix.forEach((row, y) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>row.forEach((value, x) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>if (value !== 0) {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>context.fillStyle = COLORS[value];</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>// Neon efektleri</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>context.shadowBlur = 15;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>context.shadowColor = COLORS[value];</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>// Bloğun kendisi (aralardaki grid boşluğunu koruyarak)</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>context.fillRect(x + offset.x + 0.05, y + offset.y + 0.05, 0.9, 0.9);</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>// Efekti sıfırla ki diğer çizimleri bozmasın</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>context.shadowBlur = 0;<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>});</p>
+<p class="p1"><span class="Apple-converted-space">            </span>});</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>function drawGrid() {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>context.strokeStyle = 'rgba(255, 255, 255, 0.05)';</p>
+<p class="p1"><span class="Apple-converted-space">            </span>context.lineWidth = 0.02;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>for (let i = 0; i &lt;= COLS; i++) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>context.beginPath();</p>
+<p class="p1"><span class="Apple-converted-space">                </span>context.moveTo(i, 0);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>context.lineTo(i, ROWS);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>context.stroke();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>for (let i = 0; i &lt;= ROWS; i++) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>context.beginPath();</p>
+<p class="p1"><span class="Apple-converted-space">                </span>context.moveTo(0, i);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>context.lineTo(COLS, i);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>context.stroke();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>function draw() {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Ekranı temizle</p>
+<p class="p1"><span class="Apple-converted-space">            </span>context.fillStyle = 'var(--bg-color)';</p>
+<p class="p1"><span class="Apple-converted-space">            </span>context.fillRect(0, 0, canvas.width, canvas.height);</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>drawGrid();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>drawMatrix(board, {x: 0, y: 0});</p>
+<p class="p1"><span class="Apple-converted-space">            </span>drawMatrix(player.matrix, player.pos);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>function update(time = 0) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (gameOver) return;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const deltaTime = time - lastTime;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>lastTime = time;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>dropCounter += deltaTime;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (dropCounter &gt; dropInterval) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>playerDrop();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>draw();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>animationId = requestAnimationFrame(update);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// --- MOBİL DOKUNMATİK KONTROLLER (TOUCH EVENTS) ---</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let touchStartX = 0;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let touchStartY = 0;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let touchStartTime = 0;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let isSwiping = false;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>document.addEventListener('touchstart', (e) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (e.touches.length &gt; 1 || gameOver) return;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>touchStartX = e.touches[0].clientX;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>touchStartY = e.touches[0].clientY;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>touchStartTime = Date.now();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>isSwiping = false;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}, { passive: false });</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>document.addEventListener('touchmove', (e) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (gameOver) return;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>e.preventDefault(); // iOS'ta ekranın kaymasını engelle (Çok kritik)</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (!touchStartX || !touchStartY) return;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>let touchCurrentX = e.touches[0].clientX;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>let touchCurrentY = e.touches[0].clientY;</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>let diffX = touchStartX - touchCurrentX;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>let diffY = touchStartY - touchCurrentY;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// X ekseninde sürükleme (Drag) hareketi</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (Math.abs(diffX) &gt; Math.abs(diffY)) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>// Eşiği piksel olarak belirliyoruz</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (Math.abs(diffX) &gt; BLOCK_SIZE * 0.8) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>if (diffX &gt; 0) {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>playerMove(-1); // Sola</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>playerMove(1);<span class="Apple-converted-space">  </span>// Sağa</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>// Swipe hareketini sürekli hale getirmek için başlangıç noktasını güncelle</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>touchStartX = touchCurrentX;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>isSwiping = true;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}, { passive: false });</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>document.addEventListener('touchend', (e) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (gameOver) return;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>let touchEndX = e.changedTouches[0].clientX;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>let touchEndY = e.changedTouches[0].clientY;</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>let diffX = touchStartX - touchEndX;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>let diffY = touchStartY - touchEndY;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>let timeDiff = Date.now() - touchStartTime;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Aşağı kaydırma kontrolü (Hard Drop)</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (Math.abs(diffY) &gt; Math.abs(diffX) &amp;&amp; diffY &lt; -50 &amp;&amp; timeDiff &lt; 500) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>playerHardDrop();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Tek dokunuş (Tap) algılama (Döndürme)</p>
+<p class="p1"><span class="Apple-converted-space">            </span>else if (!isSwiping &amp;&amp; Math.abs(diffX) &lt; 10 &amp;&amp; Math.abs(diffY) &lt; 10 &amp;&amp; timeDiff &lt; 300) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>playerRotate(1);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>touchStartX = null;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>touchStartY = null;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Klavye desteği (Bilgisayardan denemek istersen)</p>
+<p class="p1"><span class="Apple-converted-space">        </span>document.addEventListener('keydown', event =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (gameOver) return;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (event.keyCode === 37) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>playerMove(-1);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>} else if (event.keyCode === 39) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>playerMove(1);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>} else if (event.keyCode === 40) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>playerDrop();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>} else if (event.keyCode === 38) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>playerRotate(1);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>} else if (event.keyCode === 32) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>playerHardDrop();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Yeniden Başlat Butonu</p>
+<p class="p1"><span class="Apple-converted-space">        </span>restartBtn.addEventListener('click', () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>board = createMatrix(COLS, ROWS);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>score = 0;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>dropInterval = 1000;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>scoreElement.innerText = score;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>gameOverScreen.style.display = 'none';</p>
+<p class="p1"><span class="Apple-converted-space">            </span>gameOver = false;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>playerReset();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>update();</p>
+<p class="p1"><span class="Apple-converted-space">        </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Oyunu Başlat</p>
+<p class="p1"><span class="Apple-converted-space">        </span>playerReset();</p>
+<p class="p1"><span class="Apple-converted-space">        </span>update();</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/script&gt;</p>
+<p class="p1">&lt;/body&gt;</p>
+<p class="p1">&lt;/html&gt;</p>
+</body>
+</html>
