@@ -182,8 +182,12 @@
         } catch(e) {}
 
         document.getElementById('player-name-input').value = currentPlayerName;
-        if (!hideTutorial) document.getElementById('tutorial-screen').style.display = 'flex';
-        else document.getElementById('start-screen').style.display = 'flex';
+        if (!hideTutorial) {
+            document.getElementById('tutorial-screen').style.display = 'flex';
+        } else {
+            document.getElementById('start-screen').style.display = 'flex';
+            startMenuMusic();
+        }
 
         function padScore(num) { return num.toString().padStart(6, '0'); }
         function renderLeaderboard(elementId) {
@@ -231,6 +235,7 @@
 
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         let audioCtx, musicNoteIndex = 0, nextMusicNoteTime = 0, isMusicMuted = false, currentTrackIndex = 0;
+        let menuMusicTimer = null;
 
         const MUSIC_TRACKS = [
             {
@@ -262,8 +267,46 @@
 
         function initAudio() { if (!audioCtx) audioCtx = new AudioContext(); if (audioCtx.state === 'suspended') audioCtx.resume(); }
         
+        function startMenuMusic() {
+            initAudio();
+            if (menuMusicTimer) cancelAnimationFrame(menuMusicTimer);
+            musicNoteIndex = 0;
+            nextMusicNoteTime = audioCtx.currentTime + 0.1;
+
+            function playMenuLoop() {
+                if (gameStarted && !gameOver) return;
+                if (isMusicMuted) {
+                    menuMusicTimer = requestAnimationFrame(playMenuLoop);
+                    return;
+                }
+                const track = MUSIC_TRACKS[currentTrackIndex];
+                const beatDuration = 60 / track.tempo;
+                while (audioCtx && nextMusicNoteTime < audioCtx.currentTime + 0.1) {
+                    const [freq, beats] = track.melody[musicNoteIndex];
+                    const duration = beats * beatDuration;
+                    if (freq > 0) {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.type = 'square';
+                        osc.frequency.value = freq / 2;
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        gain.gain.setValueAtTime(0.012, nextMusicNoteTime);
+                        gain.gain.exponentialRampToValueAtTime(0.001, nextMusicNoteTime + duration - 0.05);
+                        osc.start(nextMusicNoteTime);
+                        osc.stop(nextMusicNoteTime + duration);
+                    }
+                    nextMusicNoteTime += duration;
+                    musicNoteIndex = (musicNoteIndex + 1) % track.melody.length;
+                }
+                menuMusicTimer = requestAnimationFrame(playMenuLoop);
+            }
+            playMenuLoop();
+        }
+
         function scheduleMusic() {
             if (gameOver || !gameStarted || isMusicMuted || isPaused) return;
+            if (menuMusicTimer) { cancelAnimationFrame(menuMusicTimer); menuMusicTimer = null; }
             const track = MUSIC_TRACKS[currentTrackIndex];
             const beatDuration = 60 / track.tempo;
             while (nextMusicNoteTime < audioCtx.currentTime + 0.1) {
@@ -305,7 +348,21 @@
 
         document.getElementById('music-toggle').addEventListener('click', (e) => {
             isMusicMuted = !isMusicMuted; e.target.innerText = isMusicMuted ? '🔇' : '🔊';
-            if (!isMusicMuted && gameStarted && !gameOver && !isPaused) { nextMusicNoteTime = audioCtx.currentTime + 0.1; scheduleMusic(); }
+            if (!isMusicMuted) {
+                if (gameStarted && !gameOver && !isPaused) {
+                    nextMusicNoteTime = audioCtx.currentTime + 0.1;
+                    scheduleMusic();
+                } else if (!gameStarted) {
+                    startMenuMusic();
+                }
+            }
+        });
+
+        document.getElementById('start-music-select').addEventListener('change', (e) => {
+            currentTrackIndex = parseInt(e.target.value);
+            if (!gameStarted) {
+                startMenuMusic();
+            }
         });
 
         const gameContainerObj = document.getElementById('game-container');
@@ -492,12 +549,15 @@
             isPaused = false;
             gameOver = true;
             cancelAnimationFrame(animationId);
+            if (menuMusicTimer) { cancelAnimationFrame(menuMusicTimer); menuMusicTimer = null; }
             document.getElementById('pause-screen').style.display = 'none';
             document.getElementById('game-over-screen').style.display = 'none';
             document.getElementById('start-screen').style.display = 'flex';
             gameStarted = false;
-            if (audioCtx && audioCtx.state === 'running') audioCtx.suspend();
             renderLeaderboard('start-leaderboard');
+            if (!isMusicMuted) {
+                startMenuMusic();
+            }
         }
         
         document.getElementById('pause-toggle').addEventListener('click', togglePause);
@@ -548,10 +608,12 @@
             if (document.getElementById('hide-tutorial-cb').checked) { try { localStorage.setItem('retroTetrisHideTutorial', 'true'); } catch(e){} }
             document.getElementById('tutorial-screen').style.display = 'none';
             document.getElementById('start-screen').style.display = 'flex';
+            if (!isMusicMuted) startMenuMusic();
         });
 
         document.getElementById('start-btn').addEventListener('click', () => {
             initAudio(); 
+            if (menuMusicTimer) { cancelAnimationFrame(menuMusicTimer); menuMusicTimer = null; }
             level = parseInt(document.getElementById('start-level-select').value);
             currentTrackIndex = parseInt(document.getElementById('start-music-select').value);
             dropInterval = Math.max(100, 1000 - (level - 1) * 100);
