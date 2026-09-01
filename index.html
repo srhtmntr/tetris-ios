@@ -7,7 +7,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="NeonTetris">
     <link rel="apple-touch-icon" href="https://upload.wikimedia.org/wikipedia/commons/3/39/Tetrominoes_IJLO_SZ_T.svg">
-    <title>Arcade Tetris (Pro & Tutorial)</title>
+    <title>Arcade Tetris (Jukebox Edition)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     
@@ -72,38 +72,41 @@
         input[type="text"] { background: rgba(0,0,0,0.8); color: #ffea00; border: 4px solid #444; padding: 15px; font-family: 'Press Start 2P', monospace; font-size: 16px; width: 220px; text-align: center; text-transform: uppercase; margin-bottom: 20px; outline: none; box-sizing: border-box; border-radius: 6px;}
         input[type="text"]:focus { border-color: #00ffff; box-shadow: 0 0 15px rgba(0,255,255,0.5); }
         
-        .leaderboard { font-size: 0.65rem; color: #fff; text-align: left; margin-bottom: 30px; line-height: 2.5; width: 80%; max-width: 320px; background: rgba(20,20,25,0.9); border: 2px solid #333; padding: 15px; border-radius: 8px; box-shadow: inset 0 0 15px #000;}
+        /* Müzik Seçici (Jukebox) Stilleri */
+        .music-selector {
+            display: flex; align-items: center; justify-content: space-between;
+            width: 220px; background: rgba(0,0,0,0.8); border: 2px solid #444; border-radius: 6px;
+            padding: 10px; margin-bottom: 20px; box-sizing: border-box;
+        }
+        .music-arrow { color: #ff00ff; font-size: 1rem; cursor: pointer; user-select: none; transition: transform 0.1s;}
+        .music-arrow:active { transform: scale(0.8); color: #00ffff; }
+        #music-label { font-size: 0.55rem; color: #00ffff; flex: 1; text-align: center; margin: 0 5px; line-height: 1.3; }
+
+        .leaderboard { font-size: 0.65rem; color: #fff; text-align: left; margin-bottom: 20px; line-height: 2.5; width: 80%; max-width: 320px; background: rgba(20,20,25,0.9); border: 2px solid #333; padding: 15px; border-radius: 8px; box-shadow: inset 0 0 15px #000;}
         .leaderboard span { color: #00ffff; float: right; }
         
         button.start-action { padding: 15px 25px; font-size: 0.8rem; font-family: 'Press Start 2P', monospace; background: #ff00ff; color: #fff; border: 4px solid #fff; cursor: pointer; box-shadow: 4px 4px 0 #880088; transition: transform 0.1s, box-shadow 0.1s; border-radius: 6px;}
         button.start-action:active { transform: translate(4px, 4px); box-shadow: 0 0 0 #880088; }
 
-        /* Yeni Eklenen Öğretici (Tutorial) Kutusu Stilleri */
-        .tutorial-box {
-            font-size: 0.6rem; color: #ccc; text-align: left; margin-bottom: 20px; line-height: 2; width: 85%; max-width: 350px; background: rgba(0,0,0,0.8); border: 2px solid #333; padding: 15px; border-radius: 8px; box-shadow: inset 0 0 15px #000;
-        }
+        .tutorial-box { font-size: 0.6rem; color: #ccc; text-align: left; margin-bottom: 20px; line-height: 2; width: 85%; max-width: 350px; background: rgba(0,0,0,0.8); border: 2px solid #333; padding: 15px; border-radius: 8px; box-shadow: inset 0 0 15px #000; }
         .tut-section { margin-bottom: 15px; }
         .tut-section:last-child { margin-bottom: 0; }
         .tut-title { color: #ff00ff; font-size: 0.7rem; margin-bottom: 8px; text-shadow: 1px 1px 0 #000; }
         .tut-text { color: #fff; font-family: monospace; font-size: 0.75rem; letter-spacing: 0.5px;}
         .tut-highlight { color: #ffea00; font-weight: bold;}
 
-        /* Özel Onay Kutusu (Checkbox) */
         .custom-checkbox { display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 0.55rem; color: #aaa; margin-bottom: 25px; cursor: pointer; user-select: none; }
         .custom-checkbox input { display: none; }
         .checkmark { width: 22px; height: 22px; border: 2px solid #444; background: #000; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; transition: 0.2s; box-sizing: border-box;}
         .custom-checkbox input:checked + .checkmark { background: #00ffff; border-color: #00ffff; box-shadow: 0 0 10px rgba(0,255,255,0.6);}
         .custom-checkbox input:checked + .checkmark::after { content: "✔"; color: #000; font-size: 0.8rem; font-family: sans-serif; font-weight: bold;}
-
     </style>
 </head>
 <body>
     <div id="cyber-grid"></div> 
 
-    <!-- 1. YENİ EKLENEN: ÖĞRETİCİ (TUTORIAL) EKRANI -->
     <div id="tutorial-screen" class="overlay-screen" style="display: none;">
         <h1 style="font-size: 1.6rem; animation: none;">HOW TO PLAY</h1>
-        
         <div class="tutorial-box">
             <div class="tut-section">
                 <div class="tut-title">📱 TOUCH (MOBİL)</div>
@@ -123,25 +126,28 @@
                 </div>
             </div>
         </div>
-        
         <label class="custom-checkbox">
             <input type="checkbox" id="hide-tutorial-cb">
             <span class="checkmark"></span>
             BİR DAHA GÖSTERME
         </label>
-        
         <button id="tutorial-btn" class="start-action" style="background:#00ffff; color:#000; box-shadow: 4px 4px 0 #0055ff;">ANLADIM</button>
     </div>
     
-    <!-- 2. İSİM GİRİŞİ / START EKRANI -->
     <div id="start-screen" class="overlay-screen" style="display: none;">
         <h1>NEON<br>TETRIS</h1>
         <div class="leaderboard" id="start-leaderboard"></div>
         <input type="text" id="player-name-input" maxlength="5" value="SERO">
+        
+        <div class="music-selector">
+            <span id="music-prev" class="music-arrow">◀</span>
+            <span id="music-label">1. CLASSIC</span>
+            <span id="music-next" class="music-arrow">▶</span>
+        </div>
+
         <button id="start-btn" class="start-action">START</button>
     </div>
 
-    <!-- 3. ARAYÜZ KATMANI (HOLD - SKOR - NEXT) -->
     <div id="ui-layer">
         <div class="ui-panel left">
             <span class="title">HOLD</span>
@@ -170,7 +176,6 @@
         </div>
     </div>
 
-    <!-- 4. OYUN ALANI VE BİTİŞ EKRANI -->
     <div id="game-container">
         <canvas id="tetris"></canvas>
         <div id="game-over-screen" class="overlay-screen" style="display: none;">
@@ -184,12 +189,8 @@
         // --- EKRAN YÖNETİMİ & LOCAL STORAGE ---
         const hideTutorialStr = localStorage.getItem('retroTetrisHideTutorial');
         const hideTutorial = hideTutorialStr === 'true';
-        
-        if (!hideTutorial) {
-            document.getElementById('tutorial-screen').style.display = 'flex';
-        } else {
-            document.getElementById('start-screen').style.display = 'flex';
-        }
+        if (!hideTutorial) document.getElementById('tutorial-screen').style.display = 'flex';
+        else document.getElementById('start-screen').style.display = 'flex';
 
         let localScores = JSON.parse(localStorage.getItem('retroTetrisScores')) || [ { name: 'SERO', score: 10000 }, { name: 'CPU1', score: 5000 } ];
         let currentPlayerName = localStorage.getItem('retroTetrisLastPlayer') || 'SERO';
@@ -209,42 +210,80 @@
         }
         renderLeaderboard('start-leaderboard');
 
-        // --- SES VE MÜZİK MOTORU ---
+        // --- GELİŞTİRİLMİŞ MÜZİK MOTORU (5 FARKLI TEMA) ---
+        const MUSICS = [
+            { name: "CLASSIC", bpm: 150, type: "square", vol: 0.015,
+              melody: [ [329.6, 2], [246.9, 1], [261.6, 1], [293.7, 2], [261.6, 1], [246.9, 1], [220.0, 2], [220.0, 1], [261.6, 1], [329.6, 2], [293.7, 1], [261.6, 1], [246.9, 3], [261.6, 1], [293.7, 2], [329.6, 2], [261.6, 2], [220.0, 2], [220.0, 2], [0, 2] ] },
+            { name: "CYBERPUNK", bpm: 130, type: "sawtooth", vol: 0.01,
+              melody: [ [110.0, 1], [110.0, 1], [220.0, 1], [110.0, 1], [130.8, 1], [130.8, 1], [261.6, 1], [130.8, 1], [146.8, 1], [146.8, 1], [293.7, 1], [146.8, 1], [164.8, 1], [164.8, 1], [329.6, 1], [164.8, 1] ] },
+            { name: "LO-FI CHILL", bpm: 90, type: "sine", vol: 0.02,
+              melody: [ [261.6, 2], [0, 1], [392.0, 2], [0, 1], [329.6, 4], [0, 2], [220.0, 2], [0, 1], [261.6, 2], [0, 1], [196.0, 4], [0, 2] ] },
+            { name: "ARCADE RUN", bpm: 180, type: "square", vol: 0.015,
+              melody: [ [440, 1], [523.25, 1], [659.25, 1], [0, 1], [440, 1], [523.25, 1], [659.25, 1], [0, 1], [392, 1], [493.88, 1], [587.33, 1], [0, 1], [392, 1], [493.88, 1], [587.33, 1], [0, 1] ] },
+            { name: "MYSTIC DRONE", bpm: 110, type: "triangle", vol: 0.025,
+              melody: [ [146.83, 4], [164.81, 4], [174.61, 4], [130.81, 4], [146.83, 8], [0, 4] ] }
+        ];
+
+        let currentMusicIndex = 0;
+        let selectedMusic = MUSICS[currentMusicIndex];
+        
+        function updateMusicLabel() {
+            document.getElementById('music-label').innerText = (currentMusicIndex + 1) + ". " + MUSICS[currentMusicIndex].name;
+            selectedMusic = MUSICS[currentMusicIndex];
+            musicNoteIndex = 0; 
+        }
+        
+        document.getElementById('music-prev').addEventListener('click', () => { currentMusicIndex = (currentMusicIndex - 1 + MUSICS.length) % MUSICS.length; updateMusicLabel(); });
+        document.getElementById('music-next').addEventListener('click', () => { currentMusicIndex = (currentMusicIndex + 1) % MUSICS.length; updateMusicLabel(); });
+        updateMusicLabel(); // Başlangıç yazısı
+
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         let audioCtx;
-        const MELODY = [ [329.6, 2], [246.9, 1], [261.6, 1], [293.7, 2], [261.6, 1], [246.9, 1], [220.0, 2], [220.0, 1], [261.6, 1], [329.6, 2], [293.7, 1], [261.6, 1], [246.9, 3], [261.6, 1], [293.7, 2], [329.6, 2], [261.6, 2], [220.0, 2], [220.0, 2], [0, 2] ];
         let musicNoteIndex = 0, nextMusicNoteTime = 0, isMusicMuted = false;
-        const BPM = 160, beatDuration = 60 / BPM;
 
         function initAudio() { if (!audioCtx) audioCtx = new AudioContext(); if (audioCtx.state === 'suspended') audioCtx.resume(); }
         
         function scheduleMusic() {
             if (gameOver || !gameStarted || isMusicMuted) return;
+            const beatDuration = 60 / selectedMusic.bpm;
             while (nextMusicNoteTime < audioCtx.currentTime + 0.1) {
-                const [freq, beats] = MELODY[musicNoteIndex]; const duration = beats * beatDuration;
+                const [freq, beats] = selectedMusic.melody[musicNoteIndex]; 
+                const duration = beats * beatDuration;
                 if (freq > 0) {
                     const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-                    osc.type = 'square'; osc.frequency.value = freq / 2; osc.connect(gain); gain.connect(audioCtx.destination);
-                    gain.gain.setValueAtTime(0.012, nextMusicNoteTime); gain.gain.exponentialRampToValueAtTime(0.001, nextMusicNoteTime + duration - 0.05);
+                    osc.type = selectedMusic.type; 
+                    osc.frequency.value = freq / 2; // Arka plan müziği olduğu için biraz bas frekansına çektik
+                    osc.connect(gain); gain.connect(audioCtx.destination);
+                    gain.gain.setValueAtTime(selectedMusic.vol, nextMusicNoteTime); 
+                    gain.gain.exponentialRampToValueAtTime(0.001, nextMusicNoteTime + duration - 0.05);
                     osc.start(nextMusicNoteTime); osc.stop(nextMusicNoteTime + duration);
                 }
-                nextMusicNoteTime += duration; musicNoteIndex = (musicNoteIndex + 1) % MELODY.length;
+                nextMusicNoteTime += duration; musicNoteIndex = (musicNoteIndex + 1) % selectedMusic.melody.length;
             }
             requestAnimationFrame(scheduleMusic);
         }
 
+        // --- YUMUŞATILMIŞ SES EFEKTLERİ ---
         function playSound(type) {
             if (!audioCtx || isMusicMuted) return;
             const osc = audioCtx.createOscillator(); const gainNode = audioCtx.createGain();
             osc.connect(gainNode); gainNode.connect(audioCtx.destination); const now = audioCtx.currentTime;
             
-            if (type === 'move') { osc.type = 'triangle'; osc.frequency.setValueAtTime(300, now); gainNode.gain.setValueAtTime(0.02, now); osc.start(now); osc.stop(now + 0.05); } 
-            else if (type === 'rotate') { osc.type = 'square'; osc.frequency.setValueAtTime(450, now); gainNode.gain.setValueAtTime(0.02, now); osc.start(now); osc.stop(now + 0.05); } 
-            else if (type === 'drop') { osc.type = 'sawtooth'; osc.frequency.setValueAtTime(400, now); osc.frequency.exponentialRampToValueAtTime(100, now + 0.1); gainNode.gain.setValueAtTime(0.08, now); osc.start(now); osc.stop(now + 0.1); } 
+            if (type === 'move') { osc.type = 'sine'; osc.frequency.setValueAtTime(300, now); gainNode.gain.setValueAtTime(0.015, now); osc.start(now); osc.stop(now + 0.05); } 
+            else if (type === 'rotate') { osc.type = 'square'; osc.frequency.setValueAtTime(450, now); gainNode.gain.setValueAtTime(0.015, now); osc.start(now); osc.stop(now + 0.05); } 
+            // YENİ: YUMUŞATILMIŞ DÜŞME (DROP) SESİ
+            else if (type === 'drop') { 
+                osc.type = 'triangle'; 
+                osc.frequency.setValueAtTime(150, now); 
+                osc.frequency.exponentialRampToValueAtTime(50, now + 0.1); 
+                gainNode.gain.setValueAtTime(0.05, now); // Ses kısıldı
+                gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.1); 
+                osc.start(now); osc.stop(now + 0.1); 
+            } 
             else if (type === 'clear') { osc.type = 'square'; osc.frequency.setValueAtTime(600, now); osc.frequency.setValueAtTime(900, now + 0.1); gainNode.gain.setValueAtTime(0.1, now); gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.4); osc.start(now); osc.stop(now + 0.4); } 
             else if (type === 'tetris') { osc.type = 'square'; osc.frequency.setValueAtTime(400, now); osc.frequency.linearRampToValueAtTime(800, now + 0.2); osc.frequency.linearRampToValueAtTime(1200, now + 0.4); gainNode.gain.setValueAtTime(0.2, now); gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.6); osc.start(now); osc.stop(now + 0.6); }
             else if (type === 'gameover') { osc.type = 'sawtooth'; osc.frequency.setValueAtTime(200, now); osc.frequency.exponentialRampToValueAtTime(50, now + 1); gainNode.gain.setValueAtTime(0.1, now); gainNode.gain.exponentialRampToValueAtTime(0.01, now + 1); osc.start(now); osc.stop(now + 1); }
-            else if (type === 'hold') { osc.type = 'triangle'; osc.frequency.setValueAtTime(800, now); osc.frequency.exponentialRampToValueAtTime(400, now + 0.15); gainNode.gain.setValueAtTime(0.05, now); osc.start(now); osc.stop(now + 0.15); }
+            else if (type === 'hold') { osc.type = 'triangle'; osc.frequency.setValueAtTime(800, now); osc.frequency.exponentialRampToValueAtTime(400, now + 0.15); gainNode.gain.setValueAtTime(0.03, now); osc.start(now); osc.stop(now + 0.15); }
         }
 
         document.getElementById('music-toggle').addEventListener('click', (e) => {
@@ -254,10 +293,8 @@
 
         // --- BUTON ETKİLEŞİMLERİ ---
         document.getElementById('tutorial-btn').addEventListener('click', () => {
-            initAudio(); // iOS Ses uyanması için kritik
-            if (document.getElementById('hide-tutorial-cb').checked) {
-                localStorage.setItem('retroTetrisHideTutorial', 'true');
-            }
+            initAudio(); 
+            if (document.getElementById('hide-tutorial-cb').checked) { localStorage.setItem('retroTetrisHideTutorial', 'true'); }
             document.getElementById('tutorial-screen').style.display = 'none';
             document.getElementById('start-screen').style.display = 'flex';
         });
@@ -411,20 +448,12 @@
 
         function holdPiece() {
             if (!canHold || gameOver || !gameStarted) return;
-            
             playSound('hold');
-            if (holdMatrix === null) {
-                holdMatrix = player.matrix;
-                player.matrix = nextMatrix; nextMatrix = getRandomMatrix(); drawNextPiece();
-            } else {
-                const temp = player.matrix; player.matrix = holdMatrix; holdMatrix = temp;
-            }
-            
+            if (holdMatrix === null) { holdMatrix = player.matrix; player.matrix = nextMatrix; nextMatrix = getRandomMatrix(); drawNextPiece(); } 
+            else { const temp = player.matrix; player.matrix = holdMatrix; holdMatrix = temp; }
             drawHoldPiece();
             player.pos.y = 0; player.pos.x = Math.floor(COLS / 2) - Math.floor(player.matrix[0].length / 2);
-            dropCounter = 0; lockCounter = 0; isTouchingGround = false;
-            
-            canHold = false; 
+            dropCounter = 0; lockCounter = 0; isTouchingGround = false; canHold = false; 
             document.getElementById('hold-lock').style.display = 'flex';
         }
 
@@ -438,10 +467,7 @@
         function playerHardDrop() { 
             let startY = player.pos.y;
             while (!collide(board, player)) player.pos.y++; player.pos.y--; 
-            
-            let dropDist = player.pos.y - startY;
-            score += dropDist * 2; 
-            
+            let dropDist = player.pos.y - startY; score += dropDist * 2; 
             if (player.pos.y > startY) generateDropTrail(startY, player.pos.y, player.matrix, player.pos.x);
             merge(board, player); playSound('drop'); triggerScreenShake(); playerReset(); arenaSweep(); dropCounter = 0; isTouchingGround = false; lockCounter = 0;
             scoreElement.innerText = padScore(score);
@@ -458,12 +484,8 @@
             ctx.fillRect(x + 0.05, y + 0.05, 0.9, 0.9);
             
             const gradient = ctx.createLinearGradient(x, y, x+1, y+1);
-            gradient.addColorStop(0, 'rgba(255,255,255,0.8)'); 
-            gradient.addColorStop(0.5, 'rgba(255,255,255,0)'); 
-            gradient.addColorStop(1, 'rgba(0,0,0,0.6)');       
-            ctx.fillStyle = gradient;
-            ctx.fillRect(x + 0.05, y + 0.05, 0.9, 0.9);
-            
+            gradient.addColorStop(0, 'rgba(255,255,255,0.8)'); gradient.addColorStop(0.5, 'rgba(255,255,255,0)'); gradient.addColorStop(1, 'rgba(0,0,0,0.6)');       
+            ctx.fillStyle = gradient; ctx.fillRect(x + 0.05, y + 0.05, 0.9, 0.9);
             ctx.fillStyle = 'rgba(255,255,255,0.3)'; ctx.fillRect(x + 0.25, y + 0.25, 0.5, 0.5);
         }
 
@@ -495,20 +517,14 @@
         gameContainerObj.addEventListener('touchmove', (e) => {
             if (gameOver || !gameStarted) return; e.preventDefault(); if (!touchStartX || !touchStartY) return;
             let diffX = touchStartX - e.touches[0].clientX, diffY = touchStartY - e.touches[0].clientY;
-            
-            if (Math.abs(diffX) > Math.abs(diffY)) { 
-                if (Math.abs(diffX) > BLOCK_SIZE * 0.8) { if (diffX > 0) playerMove(-1); else playerMove(1); touchStartX = e.touches[0].clientX; isSwiping = true; } 
-            }
+            if (Math.abs(diffX) > Math.abs(diffY)) { if (Math.abs(diffX) > BLOCK_SIZE * 0.8) { if (diffX > 0) playerMove(-1); else playerMove(1); touchStartX = e.touches[0].clientX; isSwiping = true; } }
         }, { passive: false });
-        
         gameContainerObj.addEventListener('touchend', (e) => {
             if (gameOver || !gameStarted) return; 
             let diffX = touchStartX - e.changedTouches[0].clientX, diffY = touchStartY - e.changedTouches[0].clientY, timeDiff = Date.now() - touchStartTime;
-            
             if (diffY < -50 && Math.abs(diffY) > Math.abs(diffX) && timeDiff < 500) { playerHardDrop(); } 
             else if (diffY > 50 && Math.abs(diffY) > Math.abs(diffX) && timeDiff < 500) { holdPiece(); }
             else if (!isSwiping && Math.abs(diffX) < 10 && Math.abs(diffY) < 10 && timeDiff < 300) { playerRotate(1); }
-            
             touchStartX = null; touchStartY = null;
         });
         
