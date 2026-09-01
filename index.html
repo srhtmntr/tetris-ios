@@ -4,16 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Tetris">
     <link rel="apple-touch-icon" href="https://upload.wikimedia.org/wikipedia/commons/3/39/Tetrominoes_IJLO_SZ_T.svg">
-    <title>Neon Tetris</title>
+    <title>Clean Tetris</title>
     <style>
         :root {
-            --bg-color: #0d0d0d;
-            --grid-color: #222;
-            --text-color: #fff;
-            --neon-glow: 10px;
+            --bg-color: #f5f5f7; /* Apple stili açık gri arka plan */
+            --grid-color: #e5e5ea;
+            --text-color: #1c1c1e;
         }
 
         body {
@@ -21,16 +20,14 @@
             padding: 0;
             background-color: var(--bg-color);
             color: var(--text-color);
-            font-family: 'Courier New', Courier, monospace;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             overflow: hidden;
-            /* Tarayıcı kaydırmalarını engelleme */
             touch-action: none;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             height: 100vh;
-            /* iOS Safe Area Uyumluluğu */
             padding-top: env(safe-area-inset-top, 20px);
             padding-bottom: env(safe-area-inset-bottom, 20px);
             box-sizing: border-box;
@@ -49,8 +46,7 @@
 
         .score-board {
             font-size: 1.5rem;
-            font-weight: bold;
-            text-shadow: 0 0 5px #fff;
+            font-weight: 700;
         }
 
         #game-container {
@@ -64,10 +60,10 @@
         }
 
         canvas {
-            background-color: var(--bg-color);
-            border: 2px solid var(--grid-color);
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
-            border-radius: 5px;
+            background-color: #ffffff; /* Matrisin içi tam beyaz */
+            border: 2px solid #d1d1d6;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
         }
 
         #game-over-screen {
@@ -76,38 +72,37 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.85);
+            background: rgba(255, 255, 255, 0.9);
             display: none;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             z-index: 20;
-            backdrop-filter: blur(3px);
+            backdrop-filter: blur(5px);
+            border-radius: 8px;
         }
 
         #game-over-screen h1 {
-            color: #ff003c;
-            text-shadow: 0 0 10px #ff003c;
+            color: #ff3b30;
             margin-bottom: 20px;
         }
 
         button {
             padding: 15px 30px;
             font-size: 1.2rem;
-            font-family: inherit;
-            background: transparent;
-            color: #00e5ff;
-            border: 2px solid #00e5ff;
-            border-radius: 8px;
+            font-weight: 600;
+            background: #007aff;
+            color: #fff;
+            border: none;
+            border-radius: 12px;
             cursor: pointer;
-            text-transform: uppercase;
-            box-shadow: 0 0 10px #00e5ff inset, 0 0 10px #00e5ff;
+            box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
             transition: all 0.2s ease;
         }
 
         button:active {
-            background: #00e5ff;
-            color: #000;
+            background: #0056b3;
+            transform: scale(0.95);
         }
     </style>
 </head>
@@ -126,7 +121,6 @@
     </div>
 
     <script>
-        // --- MOTOR VE MATRİS YAPILANDIRMASI ---
         const canvas = document.getElementById('tetris');
         const context = canvas.getContext('2d');
         const scoreElement = document.getElementById('score');
@@ -137,12 +131,10 @@
         const COLS = 10;
         let BLOCK_SIZE;
 
-        // Ekran boyutuna göre canvas'ı dinamik ölçeklendir (PWA için kritik)
         function resizeCanvas() {
             const containerHeight = document.getElementById('game-container').clientHeight;
             const containerWidth = window.innerWidth;
             
-            // Satır/sütun oranına sadık kalarak maksimum boyutu hesapla
             BLOCK_SIZE = Math.floor(Math.min((containerHeight - 20) / ROWS, (containerWidth - 20) / COLS));
             
             canvas.width = BLOCK_SIZE * COLS;
@@ -152,27 +144,27 @@
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
 
-        // 7 Standart Tetromino ve Neon Renkleri
         const SHAPES = [
-            [], // Boş indeks (0 için)
-            [[0, 0, 0, 0], [1, 1, 1, 1], [0, 0, 0, 0], [0, 0, 0, 0]], // I (Cyan)
-            [[2, 0, 0], [2, 2, 2], [0, 0, 0]], // J (Blue)
-            [[0, 0, 3], [3, 3, 3], [0, 0, 0]], // L (Orange)
-            [[4, 4], [4, 4]], // O (Yellow)
-            [[0, 5, 5], [5, 5, 0], [0, 0, 0]], // S (Green)
-            [[0, 6, 0], [6, 6, 6], [0, 0, 0]], // T (Purple)
-            [[7, 7, 0], [0, 7, 7], [0, 0, 0]]  // Z (Red)
+            [],
+            [[0, 0, 0, 0], [1, 1, 1, 1], [0, 0, 0, 0], [0, 0, 0, 0]], 
+            [[2, 0, 0], [2, 2, 2], [0, 0, 0]], 
+            [[0, 0, 3], [3, 3, 3], [0, 0, 0]], 
+            [[4, 4], [4, 4]], 
+            [[0, 5, 5], [5, 5, 0], [0, 0, 0]], 
+            [[0, 6, 0], [6, 6, 6], [0, 0, 0]], 
+            [[7, 7, 0], [0, 7, 7], [0, 0, 0]]  
         ];
 
+        // Açık temada göze çok daha iyi hitap eden, mat, canlı ve kontrast renkler
         const COLORS = [
             null,
-            '#00e5ff', // Cyan
-            '#2962ff', // Blue
-            '#ff6d00', // Orange
-            '#ffd600', // Yellow
-            '#00e676', // Green
-            '#d500f9', // Purple
-            '#ff1744'  // Red
+            '#32ADE6', // Cyan (I)
+            '#007AFF', // Blue (J)
+            '#FF9500', // Orange (L)
+            '#FFCC00', // Yellow (O)
+            '#34C759', // Green (S)
+            '#AF52DE', // Purple (T)
+            '#FF3B30'  // Red (Z)
         ];
 
         let board = createMatrix(COLS, ROWS);
@@ -188,7 +180,6 @@
             matrix: null,
         };
 
-        // --- TEMEL FONKSİYONLAR ---
         function createMatrix(w, h) {
             const matrix = [];
             while (h--) {
@@ -197,7 +188,6 @@
             return matrix;
         }
 
-        // Çarpışma Algılaması (Collision Detection)
         function collide(board, player) {
             const m = player.matrix;
             const o = player.pos;
@@ -212,7 +202,6 @@
             return false;
         }
 
-        // Bloğu matrise sabitleme
         function merge(board, player) {
             player.matrix.forEach((row, y) => {
                 row.forEach((value, x) => {
@@ -223,7 +212,6 @@
             });
         }
 
-        // Dolu satırları silme ve skoru güncelleme
         function arenaSweep() {
             let rowCount = 1;
             outer: for (let y = board.length - 1; y >= 0; --y) {
@@ -236,9 +224,8 @@
                 board.unshift(row);
                 ++y;
                 score += rowCount * 100;
-                rowCount *= 2; // Çoklu satır siliminde kombosu
+                rowCount *= 2; 
                 
-                // Hızlanma mekaniği
                 if (dropInterval > 200) {
                     dropInterval -= 20; 
                 }
@@ -246,7 +233,6 @@
             scoreElement.innerText = score;
         }
 
-        // Yeni parça üretme
         function playerReset() {
             const pieces = '1234567';
             const randIdx = Math.floor(Math.random() * pieces.length);
@@ -261,7 +247,6 @@
             }
         }
 
-        // Rotasyon (Matris transpozisyonu ve ters çevirme)
         function rotate(matrix, dir) {
             for (let y = 0; y < matrix.length; ++y) {
                 for (let x = 0; x < y; ++x) {
@@ -279,12 +264,11 @@
             const pos = player.pos.x;
             let offset = 1;
             rotate(player.matrix, dir);
-            // Duvarlardan (sınırlardan) taşmayı engellemek için Wall Kick
             while (collide(board, player)) {
                 player.pos.x += offset;
                 offset = -(offset + (offset > 0 ? 1 : -1));
                 if (offset > player.matrix[0].length) {
-                    rotate(player.matrix, -dir); // Olmuyorsa geri al
+                    rotate(player.matrix, -dir); 
                     player.pos.x = pos;
                     return;
                 }
@@ -313,33 +297,28 @@
             while (!collide(board, player)) {
                 player.pos.y++;
             }
-            player.pos.y--; // Çarptığı anın bir üstüne geri dön
+            player.pos.y--; 
             merge(board, player);
             playerReset();
             arenaSweep();
             dropCounter = 0;
         }
 
-        // --- ÇİZİM İŞLEMLERİ ---
         function drawMatrix(matrix, offset) {
             matrix.forEach((row, y) => {
                 row.forEach((value, x) => {
                     if (value !== 0) {
                         context.fillStyle = COLORS[value];
-                        // Neon efektleri
-                        context.shadowBlur = 15;
-                        context.shadowColor = COLORS[value];
-                        // Bloğun kendisi (aralardaki grid boşluğunu koruyarak)
+                        // Shadow (gölge) özelliğini tamamen kaldırdık. 
+                        // Sadece saf ve keskin çizim yapıyoruz.
                         context.fillRect(x + offset.x + 0.05, y + offset.y + 0.05, 0.9, 0.9);
-                        // Efekti sıfırla ki diğer çizimleri bozmasın
-                        context.shadowBlur = 0; 
                     }
                 });
             });
         }
 
         function drawGrid() {
-            context.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+            context.strokeStyle = 'rgba(0, 0, 0, 0.05)';
             context.lineWidth = 0.02;
             for (let i = 0; i <= COLS; i++) {
                 context.beginPath();
@@ -356,8 +335,8 @@
         }
 
         function draw() {
-            // Ekranı temizle
-            context.fillStyle = 'var(--bg-color)';
+            // Arka plan artık matris rengi (beyaz)
+            context.fillStyle = '#ffffff';
             context.fillRect(0, 0, canvas.width, canvas.height);
             
             drawGrid();
@@ -380,7 +359,6 @@
             animationId = requestAnimationFrame(update);
         }
 
-        // --- MOBİL DOKUNMATİK KONTROLLER (TOUCH EVENTS) ---
         let touchStartX = 0;
         let touchStartY = 0;
         let touchStartTime = 0;
@@ -396,7 +374,7 @@
 
         document.addEventListener('touchmove', (e) => {
             if (gameOver) return;
-            e.preventDefault(); // iOS'ta ekranın kaymasını engelle (Çok kritik)
+            e.preventDefault(); 
             
             if (!touchStartX || !touchStartY) return;
 
@@ -406,16 +384,13 @@
             let diffX = touchStartX - touchCurrentX;
             let diffY = touchStartY - touchCurrentY;
 
-            // X ekseninde sürükleme (Drag) hareketi
             if (Math.abs(diffX) > Math.abs(diffY)) {
-                // Eşiği piksel olarak belirliyoruz
                 if (Math.abs(diffX) > BLOCK_SIZE * 0.8) {
                     if (diffX > 0) {
-                        playerMove(-1); // Sola
+                        playerMove(-1);
                     } else {
-                        playerMove(1);  // Sağa
+                        playerMove(1);
                     }
-                    // Swipe hareketini sürekli hale getirmek için başlangıç noktasını güncelle
                     touchStartX = touchCurrentX;
                     isSwiping = true;
                 }
@@ -431,11 +406,9 @@
             let diffY = touchStartY - touchEndY;
             let timeDiff = Date.now() - touchStartTime;
 
-            // Aşağı kaydırma kontrolü (Hard Drop)
             if (Math.abs(diffY) > Math.abs(diffX) && diffY < -50 && timeDiff < 500) {
                 playerHardDrop();
             } 
-            // Tek dokunuş (Tap) algılama (Döndürme)
             else if (!isSwiping && Math.abs(diffX) < 10 && Math.abs(diffY) < 10 && timeDiff < 300) {
                 playerRotate(1);
             }
@@ -444,7 +417,6 @@
             touchStartY = null;
         });
 
-        // Klavye desteği (Bilgisayardan denemek istersen)
         document.addEventListener('keydown', event => {
             if (gameOver) return;
             if (event.keyCode === 37) {
@@ -460,7 +432,6 @@
             }
         });
 
-        // Yeniden Başlat Butonu
         restartBtn.addEventListener('click', () => {
             board = createMatrix(COLS, ROWS);
             score = 0;
@@ -472,7 +443,6 @@
             update();
         });
 
-        // Oyunu Başlat
         playerReset();
         update();
     </script>
