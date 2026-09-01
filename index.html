@@ -3,14 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="TetrisPro">
-    <link rel="apple-touch-icon" href="https://upload.wikimedia.org/wikipedia/commons/3/39/Tetrominoes_IJLO_SZ_T.svg">
-    <title>Arcade Tetris (Ultimate E-Sports)</title>
-    
+    <title>Arcade Tetris (Native iOS)</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-    
     <style>
         :root { --bg-color: #020005; --text-color: #fff; --theme-glow: rgba(0, 255, 255, 0.15); --theme-color: #00ffff; }
         
@@ -20,7 +14,6 @@
         @keyframes gridScroll { 0% { transform: translateY(0) scale(1.1); } 100% { transform: translateY(50px) scale(1.1); } }
         body::after { content: ""; display: block; position: absolute; top: 0; left: 0; bottom: 0; right: 0; background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%), radial-gradient(circle, rgba(0,0,0,0) 40%, rgba(0,0,0,0.95) 100%); z-index: 100; pointer-events: none; box-shadow: inset 0 0 80px #000; background-size: 100% 3px, 100% 100%; }
 
-        /* Arayüz */
         #ui-layer { width: 100%; max-width: 450px; display: flex; justify-content: space-between; align-items: flex-start; padding: 10px; box-sizing: border-box; z-index: 10; position: relative; flex-shrink: 0; }
         .ui-panel { display: flex; flex-direction: column; align-items: center; gap: 5px; }
         .ui-panel span.title { font-size: 0.5rem; color: var(--theme-color); text-shadow: 1px 1px 0 #000, 0 0 5px var(--theme-glow); margin-bottom: 3px; transition: color 1s ease;}
@@ -37,7 +30,6 @@
 
         #music-toggle { background: rgba(0,0,0,0.5); border: 1px solid #444; color: #fff; font-size: 0.6rem; width: 100%; padding: 8px 0; font-family: 'Press Start 2P'; cursor: pointer; border-radius: 4px; margin-top: 5px;}
         
-        /* Combo Timer Bar */
         #combo-container { width: 100%; height: 6px; background: #222; border-radius: 3px; overflow: hidden; margin-top: 5px; border: 1px solid #444;}
         #combo-bar { width: 0%; height: 100%; background: #ffea00; box-shadow: 0 0 10px #ffea00; transition: width 0.1s linear;}
 
@@ -50,21 +42,19 @@
         .floating-text { position: absolute; font-family: 'Press Start 2P', monospace; font-size: 0.9rem; font-weight: bold; text-shadow: 3px 3px 0 #000, 0 0 15px currentColor; pointer-events: none; animation: floatUp 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards; z-index: 50; text-align: center; line-height: 1.5;}
         @keyframes floatUp { 0% { opacity: 1; transform: translateY(20px) scale(0.8); } 20% { transform: translateY(0) scale(1.2); } 100% { opacity: 0; transform: translateY(-70px) scale(1); } }
 
-        /* Başarım (Toast) Bildirimi */
         #toast-container { position: absolute; top: 15%; left: 50%; transform: translateX(-50%); z-index: 200; pointer-events: none; display: flex; flex-direction: column; gap: 10px; width: 90%; max-width: 350px;}
         .toast { background: rgba(0,0,0,0.85); border: 2px solid #ffea00; border-left: 8px solid #ffea00; color: #fff; padding: 10px 15px; border-radius: 6px; box-shadow: 0 4px 15px rgba(0,0,0,0.8); display: flex; align-items: center; gap: 10px; animation: slideIn 0.5s ease-out, fadeOut 0.5s ease-in 3.5s forwards; font-size: 0.55rem; line-height: 1.4;}
         .toast-icon { font-size: 1.2rem; }
         @keyframes slideIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
 
-        /* Ekranlar */
         .overlay-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 20; border: 4px solid #444; box-sizing: border-box; text-align: center; }
         h1 { color: var(--theme-color); text-shadow: 3px 3px 0 #0055ff, 0 0 30px var(--theme-glow); margin-bottom: 20px; font-size: 2rem; line-height: 1.4; animation: neonPulse 2s infinite; transition: color 1s ease;}
         @keyframes neonPulse { 0%, 100% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.03); filter: brightness(1.5); } }
         
         .setup-group { display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px;}
-        input[type="text"] { background: rgba(0,0,0,0.8); color: #ffea00; border: 2px solid #444; padding: 12px; font-family: 'Press Start 2P', monospace; font-size: 14px; width: 220px; text-align: center; text-transform: uppercase; outline: none; border-radius: 6px;}
-        select { background: rgba(0,0,0,0.8); color: #00ffff; border: 2px solid #444; padding: 12px; font-family: 'Press Start 2P', monospace; font-size: 12px; width: 220px; outline: none; border-radius: 6px; text-align: center; appearance: none;}
+        input[type="text"], select { background: rgba(0,0,0,0.8); color: #ffea00; border: 2px solid #444; padding: 12px; font-family: 'Press Start 2P', monospace; font-size: 14px; width: 220px; text-align: center; text-transform: uppercase; outline: none; border-radius: 6px; appearance: none;}
+        select { color: #00ffff; font-size: 12px; }
         
         .leaderboard { font-size: 0.6rem; color: #fff; text-align: left; margin-bottom: 20px; line-height: 2.2; width: 80%; max-width: 300px; background: rgba(20,20,25,0.9); border: 2px solid #333; padding: 15px; border-radius: 8px;}
         .leaderboard span { color: #00ffff; float: right; }
@@ -72,7 +62,6 @@
         button.start-action { padding: 15px 25px; font-size: 0.8rem; font-family: 'Press Start 2P', monospace; background: #ff00ff; color: #fff; border: 4px solid #fff; cursor: pointer; box-shadow: 4px 4px 0 #880088; border-radius: 6px;}
         button.start-action:active { transform: translate(4px, 4px); box-shadow: 0 0 0 #880088; }
         
-        /* Öğretici Stilleri */
         .tutorial-box { font-size: 0.55rem; color: #ccc; text-align: left; margin-bottom: 15px; line-height: 1.8; width: 85%; max-width: 350px; background: rgba(0,0,0,0.8); border: 2px solid #333; padding: 15px; border-radius: 8px;}
         .tut-section { margin-bottom: 15px; } .tut-title { color: #ff00ff; font-size: 0.6rem; margin-bottom: 8px; }
         .custom-checkbox { display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 0.55rem; color: #aaa; margin-bottom: 15px; cursor: pointer; user-select: none; }
@@ -84,7 +73,7 @@
 </head>
 <body>
     <div id="cyber-grid"></div> 
-    <div id="toast-container"></div> <!-- Başarımlar buraya düşecek -->
+    <div id="toast-container"></div> 
 
     <div id="tutorial-screen" class="overlay-screen" style="display: none;">
         <h1 style="font-size: 1.4rem;">HOW TO PLAY</h1>
@@ -134,7 +123,6 @@
                 <div>HI-SCORE</div><div id="hi-score" class="score-val hi-score-val">000000</div>
                 <div style="margin-top: 5px;">SCORE</div><div id="score" class="score-val">000000</div>
                 <div style="margin-top: 5px;">LEVEL <span id="level" class="level-val">1</span></div>
-                <!-- COMBO ZAMAN BARI -->
                 <div id="combo-container"><div id="combo-bar"></div></div>
             </div>
             <button id="music-toggle">MUTE: OFF</button>
@@ -156,43 +144,27 @@
     </div>
 
     <script>
-        // --- TEMA MOTORU ---
-        const THEMES = [
-            { color: '#00ffff', glow: 'rgba(0, 255, 255, 0.15)' }, // Lvl 1: Cyan
-            { color: '#ff00ff', glow: 'rgba(255, 0, 255, 0.15)' }, // Lvl 2: Magenta
-            { color: '#ffea00', glow: 'rgba(255, 234, 0, 0.15)' }, // Lvl 3: Yellow
-            { color: '#00ff00', glow: 'rgba(0, 255, 0, 0.15)' },   // Lvl 4: Green
-            { color: '#ff0000', glow: 'rgba(255, 0, 0, 0.15)' },   // Lvl 5: Red
-        ];
-        function updateTheme(lvl) {
-            const t = THEMES[(lvl - 1) % THEMES.length];
-            document.documentElement.style.setProperty('--theme-color', t.color);
-            document.documentElement.style.setProperty('--theme-glow', t.glow);
-        }
+        // --- HATA GİDERİCİ (SAFE) LOCAL STORAGE ---
+        let unlocks = { tetris: false, tspin: false, lvl10: false, combo5: false };
+        let localScores = [ { name: 'SERO', score: 10000 }, { name: 'CPU1', score: 5000 } ];
+        let currentPlayerName = 'SERO';
+        let hideTutorial = false;
 
-        // --- HAPTIC FEEDBACK (TİTREŞİM) ---
-        function vibrate(ms) { try { if (navigator.vibrate) navigator.vibrate(ms); } catch (e) {} }
+        try {
+            const storedUnlocks = localStorage.getItem('tetrisUnlocks');
+            if (storedUnlocks) unlocks = JSON.parse(storedUnlocks);
+            
+            const storedScores = localStorage.getItem('retroTetrisScores');
+            if (storedScores) localScores = JSON.parse(storedScores);
+            
+            currentPlayerName = localStorage.getItem('retroTetrisLastPlayer') || 'SERO';
+            hideTutorial = localStorage.getItem('retroTetrisHideTutorial') === 'true';
+        } catch(e) { console.log("Storage access error in Native WKWebView"); }
 
-        // --- BAŞARIMLAR (ACHIEVEMENTS) ---
-        let unlocks = JSON.parse(localStorage.getItem('tetrisUnlocks')) || { tetris: false, tspin: false, lvl10: false, combo5: false };
-        function checkAchievement(id, title, desc) {
-            if(!unlocks[id]) {
-                unlocks[id] = true; localStorage.setItem('tetrisUnlocks', JSON.stringify(unlocks));
-                playSound('achievement');
-                const t = document.createElement('div'); t.className = 'toast';
-                t.innerHTML = `<div class="toast-icon">🏆</div><div><strong>ACHIEVEMENT UNLOCKED</strong><br>${title}</div>`;
-                document.getElementById('toast-container').appendChild(t);
-                setTimeout(() => t.remove(), 4500);
-            }
-        }
+        document.getElementById('player-name-input').value = currentPlayerName;
 
-        // --- LOCAL STORAGE ---
-        const hideTutorial = localStorage.getItem('retroTetrisHideTutorial') === 'true';
         if (!hideTutorial) document.getElementById('tutorial-screen').style.display = 'flex';
         else document.getElementById('start-screen').style.display = 'flex';
-
-        let localScores = JSON.parse(localStorage.getItem('retroTetrisScores')) || [ { name: 'SERO', score: 10000 }, { name: 'CPU1', score: 5000 } ];
-        document.getElementById('player-name-input').value = localStorage.getItem('retroTetrisLastPlayer') || 'SERO';
 
         function padScore(num) { return num.toString().padStart(6, '0'); }
         function renderLeaderboard(elementId) {
@@ -203,10 +175,48 @@
         }
         function saveLocalScore(name, newScore) {
             localScores.push({ name: name, score: newScore }); localScores.sort((a, b) => b.score - a.score); localScores = localScores.slice(0, 5);
-            localStorage.setItem('retroTetrisScores', JSON.stringify(localScores)); localStorage.setItem('retroTetrisLastPlayer', name);
+            try {
+                localStorage.setItem('retroTetrisScores', JSON.stringify(localScores)); 
+                localStorage.setItem('retroTetrisLastPlayer', name);
+            } catch(e) {}
             renderLeaderboard('final-leaderboard');
         }
         renderLeaderboard('start-leaderboard');
+
+        // --- TEMA VE NATIVE TİTREŞİM (TAPTIC ENGINE) KÖPRÜSÜ ---
+        const THEMES = [
+            { color: '#00ffff', glow: 'rgba(0, 255, 255, 0.15)' }, { color: '#ff00ff', glow: 'rgba(255, 0, 255, 0.15)' },
+            { color: '#ffea00', glow: 'rgba(255, 234, 0, 0.15)' }, { color: '#00ff00', glow: 'rgba(0, 255, 0, 0.15)' },
+            { color: '#ff0000', glow: 'rgba(255, 0, 0, 0.15)' }
+        ];
+        function updateTheme(lvl) {
+            const t = THEMES[(lvl - 1) % THEMES.length];
+            document.documentElement.style.setProperty('--theme-color', t.color);
+            document.documentElement.style.setProperty('--theme-glow', t.glow);
+        }
+
+        // Native iOS Titreşimi tetikler (Swift kodunla konuşur)
+        function vibrate(ms) { 
+            try { 
+                if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.hapticBridge) {
+                    window.webkit.messageHandlers.hapticBridge.postMessage('vibrate');
+                } else if (navigator.vibrate) {
+                    navigator.vibrate(ms); 
+                }
+            } catch (e) {} 
+        }
+
+        function checkAchievement(id, title, desc) {
+            if(!unlocks[id]) {
+                unlocks[id] = true; 
+                try { localStorage.setItem('tetrisUnlocks', JSON.stringify(unlocks)); } catch(e){}
+                playSound('achievement');
+                const t = document.createElement('div'); t.className = 'toast';
+                t.innerHTML = `<div class="toast-icon">🏆</div><div><strong>ACHIEVEMENT UNLOCKED</strong><br>${title}</div>`;
+                document.getElementById('toast-container').appendChild(t);
+                setTimeout(() => t.remove(), 4500);
+            }
+        }
 
         // --- SES MOTORU ---
         const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -252,9 +262,10 @@
             if (!isMusicMuted && gameStarted && !gameOver) { nextMusicNoteTime = audioCtx.currentTime + 0.1; scheduleMusic(); }
         });
 
-        // --- GÖRSEL EFEKTLER (Partiküller & Toast) ---
-        let particles = [], dropTrails = [];
+        // --- GÖRSEL EFEKTLER VE ÇİFT TANIMLAMA DÜZELTMELERİ ---
+        // gameContainerObj burada sadece bir kez tanımlanıyor!
         const gameContainerObj = document.getElementById('game-container');
+        let particles = [], dropTrails = [];
         const COLORS = [null, '#00ffff', '#0055ff', '#ff8800', '#ffff00', '#00ff00', '#ff00ff', '#ff0000'];
 
         function createParticles(yLine) {
@@ -282,8 +293,11 @@
         const ROWS = 20, COLS = 10; let BLOCK_SIZE, gameStarted = false;
         
         function resizeCanvas() {
-            const containerHeight = gameContainerObj.clientHeight; const containerWidth = gameContainerObj.clientWidth; 
+            const containerHeight = gameContainerObj.clientHeight || (window.innerHeight * 0.7); 
+            const containerWidth = gameContainerObj.clientWidth || window.innerWidth; 
             BLOCK_SIZE = Math.floor(Math.min((containerHeight - 10) / ROWS, (containerWidth - 10) / COLS));
+            if (BLOCK_SIZE < 1) BLOCK_SIZE = 20; // Güvenlik yedeği (Failsafe)
+
             canvas.width = BLOCK_SIZE * COLS; canvas.height = BLOCK_SIZE * ROWS; context.scale(BLOCK_SIZE, BLOCK_SIZE);
             const SIDE_BLOCK = 15;
             nextContext.setTransform(1, 0, 0, 1, 0, 0); nextCanvas.width = 4 * SIDE_BLOCK; nextCanvas.height = 4 * SIDE_BLOCK; nextContext.scale(SIDE_BLOCK, SIDE_BLOCK);
@@ -297,33 +311,26 @@
         let board = createMatrix(COLS, ROWS), dropCounter = 0, dropInterval = 1000, lastTime = 0, score = 0, level = 1, linesClearedTotal = 0;
         let gameOver = false, animationId;
         
-        let nextMatrix = null, holdMatrix = null, canHold = true;
-        let currentCombo = 0, comboTimeLeft = 0, comboMaxTime = 6000; // 6 Saniye Kombo Süresi
+        let nextMatrix = null, holdMatrix = null, canHold = true, currentCombo = 0;
+        let comboTimeLeft = 0, comboMaxTime = 6000; 
         let lockDelay = 500, lockCounter = 0, isTouchingGround = false, lastAction = '';
         const player = { pos: {x: 0, y: 0}, matrix: null };
 
         function createMatrix(w, h) { const matrix = []; while (h--) matrix.push(new Array(w).fill(0)); return matrix; }
         function getRandomMatrix() { const p = '1234567'; return SHAPES[p[Math.floor(Math.random() * p.length)]]; }
 
-        // --- T-SPIN DEDEKTÖRÜ ---
         function checkTSpin() {
-            // Parça T mi? (Değeri 6)
             if (!player.matrix.some(row => row.includes(6)) || lastAction !== 'rotate') return false;
-            
-            // T Parçasının 4 köşesini (3x3 grid içinde) kontrol et
-            const corners = [[0,0], [0,2], [2,0], [2,2]];
-            let filledCorners = 0;
-            
+            const corners = [[0,0], [0,2], [2,0], [2,2]]; let filledCorners = 0;
             corners.forEach(c => {
                 let cx = player.pos.x + c[0]; let cy = player.pos.y + c[1];
                 if (cy >= ROWS || cx < 0 || cx >= COLS || (cy >= 0 && board[cy][cx] !== 0)) filledCorners++;
             });
-            
-            return filledCorners >= 3; // 3 Köşe doluysa T-Spin'dir!
+            return filledCorners >= 3; 
         }
 
         function arenaSweep() {
-            let rowCount = 1, linesCleared = 0, linesToClear = [];
+            let linesCleared = 0, linesToClear = [];
             const isTSpin = checkTSpin();
 
             outer: for (let y = board.length - 1; y >= 0; --y) {
@@ -334,7 +341,7 @@
                 linesToClear.forEach(y => { const row = board.splice(y, 1)[0].fill(0); board.unshift(row); });
                 linesCleared = linesToClear.length;
                 
-                currentCombo++; comboTimeLeft = comboMaxTime; // Kombo süresini yenile
+                currentCombo++; comboTimeLeft = comboMaxTime; 
                 if (currentCombo === 5) checkAchievement('combo5', 'COMBO MASTER', 'Ulaştığın 5x Kombo!');
 
                 let comboMultiplier = currentCombo > 1 ? currentCombo : 1;
@@ -366,9 +373,7 @@
                     if(level === 10) checkAchievement('lvl10', 'VETERAN', 'Level 10 Zorluğuna Ulaştın!');
                 }
                 scoreElement.innerText = padScore(score); levelElement.innerText = level;
-            } else if (comboTimeLeft <= 0) {
-                currentCombo = 0; // Süre bittiyse kombo sıfırlanır
-            }
+            } else if (comboTimeLeft <= 0) { currentCombo = 0; }
         }
 
         function collide(board, player) { const m = player.matrix, o = player.pos; for (let y = 0; y < m.length; ++y) { for (let x = 0; x < m[y].length; ++x) { if (m[y][x] !== 0 && (board[y + o.y] && board[y + o.y][x + o.x]) !== 0) return true; } } return false; }
@@ -403,17 +408,11 @@
         function checkGroundStatus() { player.pos.y++; if (collide(board, player)) { isTouchingGround = true; } else { isTouchingGround = false; lockCounter = 0; } player.pos.y--; }
         function rotate(matrix, dir) { for (let y = 0; y < matrix.length; ++y) { for (let x = 0; x < y; ++x) [matrix[x][y], matrix[y][x]] = [matrix[y][x], matrix[x][y]]; } if (dir > 0) matrix.forEach(row => row.reverse()); else matrix.reverse(); }
         
-        // --- SUPER ROTATION SYSTEM (WALL KICK) ---
         function playerRotate(dir) { 
             const pos = player.pos.x; const posY = player.pos.y; rotate(player.matrix, dir); 
-            // Duvarlardan ve bloklardan kayma testleri (Basitleştirilmiş SRS)
             const kicks = [ {x: 0, y: 0}, {x: -1, y: 0}, {x: 1, y: 0}, {x: 0, y: -1}, {x: -1, y: -1}, {x: 1, y: -1}, {x: -2, y: 0}, {x: 2, y: 0} ];
-            
             let success = false;
-            for(let i=0; i<kicks.length; i++) {
-                player.pos.x = pos + kicks[i].x; player.pos.y = posY + kicks[i].y;
-                if (!collide(board, player)) { success = true; break; }
-            }
+            for(let i=0; i<kicks.length; i++) { player.pos.x = pos + kicks[i].x; player.pos.y = posY + kicks[i].y; if (!collide(board, player)) { success = true; break; } }
             if (!success) { rotate(player.matrix, -dir); player.pos.x = pos; player.pos.y = posY; } 
             else { playSound('rotate'); lockCounter = 0; lastAction = 'rotate'; checkGroundStatus(); }
         }
@@ -431,7 +430,6 @@
         }
 
         // --- ÇİZİM İŞLEMLERİ ---
-        const COLORS = [null, '#00ffff', '#0055ff', '#ff8800', '#ffff00', '#00ff00', '#ff00ff', '#ff0000'];
         function drawRetroBlock(ctx, x, y, value, isGhost = false, isFlashing = false) {
             if (isGhost) { ctx.fillStyle = 'rgba(255, 255, 255, 0.1)'; ctx.fillRect(x, y, 1, 1); return; }
             const color = COLORS[value]; ctx.fillStyle = '#000'; ctx.fillRect(x, y, 1, 1); 
@@ -458,7 +456,6 @@
             if (gameOver || !gameStarted) return;
             const deltaTime = time - lastTime; lastTime = time; dropCounter += deltaTime;
             
-            // Combo Bar Update
             if (currentCombo > 0) {
                 comboTimeLeft -= deltaTime;
                 document.getElementById('combo-bar').style.width = Math.max(0, (comboTimeLeft / comboMaxTime) * 100) + '%';
@@ -470,15 +467,16 @@
             draw(); animationId = requestAnimationFrame(update);
         }
 
-        // --- BAŞLATMA VE KONTROLLER ---
+        // --- BUTON ETKİLEŞİMLERİ ---
         document.getElementById('tutorial-btn').addEventListener('click', () => {
-            initAudio(); if (document.getElementById('hide-tutorial-cb').checked) { localStorage.setItem('retroTetrisHideTutorial', 'true'); }
-            document.getElementById('tutorial-screen').style.display = 'none'; document.getElementById('start-screen').style.display = 'flex';
+            initAudio(); 
+            if (document.getElementById('hide-tutorial-cb').checked) { try { localStorage.setItem('retroTetrisHideTutorial', 'true'); } catch(e){} }
+            document.getElementById('tutorial-screen').style.display = 'none';
+            document.getElementById('start-screen').style.display = 'flex';
         });
 
         document.getElementById('start-btn').addEventListener('click', () => {
             initAudio(); 
-            // Level Seçimi
             level = parseInt(document.getElementById('start-level-select').value);
             dropInterval = Math.max(100, 1000 - (level - 1) * 100);
             updateTheme(level);
@@ -501,8 +499,8 @@
             if(!isMusicMuted) { nextMusicNoteTime = audioCtx.currentTime + 0.1; scheduleMusic(); }
         });
 
+        // --- KONTROLLER ---
         let touchStartX = 0, touchStartY = 0, touchStartTime = 0, isSwiping = false; 
-        const gameContainerObj = document.getElementById('game-container');
         
         gameContainerObj.addEventListener('touchstart', (e) => { if (e.touches.length > 1 || gameOver || !gameStarted) return; touchStartX = e.touches[0].clientX; touchStartY = e.touches[0].clientY; touchStartTime = Date.now(); isSwiping = false; }, { passive: false });
         gameContainerObj.addEventListener('touchmove', (e) => {
